@@ -2,8 +2,6 @@
 #ifndef CSAPS_H
 #define CSAPS_H
 
-#include <vector>
-
 #include <Eigen/Dense>
 
 
