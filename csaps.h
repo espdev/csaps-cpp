@@ -27,6 +27,7 @@ public:
 protected:
   void MakeSpline();
   DoubleVector Evaluate(const DoubleVector &xidata);
+  static DoubleVector Diff(const DoubleVector &vec);
 
 protected:
   DoubleVector m_xdata;

@@ -75,4 +75,10 @@ DoubleVector UnivariateCubicSmoothingSpline::Evaluate(const DoubleVector & xidat
   return DoubleVector();
 }
 
+DoubleVector UnivariateCubicSmoothingSpline::Diff(const DoubleVector &vec)
+{
+  size_t n = vec.size() - 1;
+  return vec.tail(n) - vec.head(n);
+}
+
 } // namespace csaps
