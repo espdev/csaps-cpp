@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 #include "csaps.h"
 
@@ -86,6 +87,17 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
 
 DoubleArray UnivariateCubicSmoothingSpline::Evaluate(const DoubleArray & xidata)
 {
+  const size_t pcount = m_xdata.size();
+
+  auto mesh = m_xdata.segment(1, pcount - 2);
+  DoubleArray edges(pcount);
+
+  edges(0) = -DoubleLimits::infinity();
+  edges.segment(1, pcount - 2) = mesh;
+  edges(pcount - 1) = DoubleLimits::infinity();
+
+  auto indexes = Digitize(xidata, edges);
+
   return DoubleArray();
 }
 
@@ -93,6 +105,35 @@ DoubleArray UnivariateCubicSmoothingSpline::Diff(const DoubleArray &vec)
 {
   size_t n = vec.size() - 1;
   return vec.tail(n) - vec.head(n);
+}
+
+IndexArray UnivariateCubicSmoothingSpline::Digitize(const DoubleArray &arr, const DoubleArray &bins)
+{
+  // This code works if `arr` and `bins` are monotonically increasing
+
+  IndexArray indexes(arr.size());
+
+  // Greater or equal (a >= b)
+  auto ge = [](double a, double b)
+  {
+    return a > b || std::abs(a - b) < std::abs(std::min(a, b)) * 1.e-8;
+  };
+
+  Eigen::DenseIndex kstart = 1;
+
+  for (Eigen::DenseIndex i = 0; i < arr.size(); ++i) {
+    double val = arr(i);
+
+    for (Eigen::DenseIndex k = kstart; k < bins.size(); ++k) {
+      if (ge(val, bins(k - 1)) && val < bins(k)) {
+        indexes(i) = k;
+        kstart = k;
+        break;
+      }
+    }
+  }
+
+  return indexes;
 }
 
 } // namespace csaps

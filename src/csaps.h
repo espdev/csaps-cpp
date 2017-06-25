@@ -2,6 +2,8 @@
 #ifndef CSAPS_H
 #define CSAPS_H
 
+#include <limits>
+
 #include <Eigen/Dense>
 
 
@@ -9,6 +11,9 @@ namespace csaps
 {
 
 typedef Eigen::ArrayXd DoubleArray;
+typedef Eigen::Array<Eigen::DenseIndex, Eigen::Dynamic, 1> IndexArray;
+
+typedef std::numeric_limits<double> DoubleLimits;
 
 
 class UnivariateCubicSmoothingSpline
@@ -27,7 +32,12 @@ protected:
 
   void MakeSpline();
   DoubleArray Evaluate(const DoubleArray &xidata);
+
+  //! Calculate the 1-th discrete difference
   static DoubleArray Diff(const DoubleArray &vec);
+
+  //! Return the indices of the bins to which each value in input array belongs
+  static IndexArray Digitize(const DoubleArray &arr, const DoubleArray &bins);
 
 protected:
   DoubleArray m_xdata;
