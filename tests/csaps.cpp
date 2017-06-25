@@ -30,5 +30,28 @@ TEST_CASE("Univariate auto smoothing", "[csaps]")
   const size_t xi_pcount = 120;
 
   csaps::UnivariateCubicSmoothingSpline sp(xdata, ydata);
-  csaps::DoubleArray yidata = sp(xi_pcount);
+  csaps::DoubleArray xidata;
+  csaps::DoubleArray yidata = sp(xi_pcount, xidata);
+
+  REQUIRE(xidata.size() == xi_pcount);
+  REQUIRE(yidata.size() == xi_pcount);
+}
+
+
+TEST_CASE("Univariate two points", "[csaps]")
+{
+  const size_t pcount = 2;
+
+  csaps::DoubleArray xdata(pcount); xdata << 1., 2.;
+  csaps::DoubleArray ydata(pcount); ydata << 3., 4.;
+  csaps::DoubleArray xidata(pcount + 1); xidata << 1., 1.5, 2.;
+
+  csaps::UnivariateCubicSmoothingSpline sp(xdata, ydata);
+
+  csaps::DoubleArray yidata = sp(xidata);
+
+  csaps::DoubleArray desired_yidata(pcount + 1); desired_yidata << 3., 3.5, 4.;
+
+  REQUIRE(yidata.size() == pcount + 1);
+  REQUIRE(yidata.isApprox(desired_yidata));
 }
