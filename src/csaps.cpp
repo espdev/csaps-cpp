@@ -111,7 +111,7 @@ IndexArray UnivariateCubicSmoothingSpline::Digitize(const DoubleArray &arr, cons
 {
   // This code works if `arr` and `bins` are monotonically increasing
 
-  IndexArray indexes(arr.size());
+  IndexArray indexes = IndexArray::Zero(arr.size());
 
   auto is_inside_bin = [arr, bins](Eigen::DenseIndex item, Eigen::DenseIndex index)
   {
