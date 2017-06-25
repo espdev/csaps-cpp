@@ -8,31 +8,35 @@
 namespace csaps
 {
 
-typedef Eigen::VectorXd DoubleVector;
+typedef Eigen::ArrayXd DoubleArray;
 
 
 class UnivariateCubicSmoothingSpline
 {
 public:
-  UnivariateCubicSmoothingSpline(const DoubleVector &xdata, const DoubleVector &ydata);
-  UnivariateCubicSmoothingSpline(const DoubleVector &xdata, const DoubleVector &ydata, const DoubleVector &weights);
-  UnivariateCubicSmoothingSpline(const DoubleVector &xdata, const DoubleVector &ydata, double smooth);
-  UnivariateCubicSmoothingSpline(const DoubleVector &xdata, const DoubleVector &ydata, const DoubleVector &weights, double smooth);
+  UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata);
+  UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata, const DoubleArray &weights);
+  UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata, double smooth);
+  UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata, const DoubleArray &weights, double smooth);
 
-  DoubleVector operator()(const DoubleVector &xidata);
-  DoubleVector operator()(size_t pcount);
+  DoubleArray operator()(const DoubleArray &xidata);
+  DoubleArray operator()(size_t pcount);
 
 protected:
+  typedef Eigen::ArrayXXd Coeffs;
+
   void MakeSpline();
-  DoubleVector Evaluate(const DoubleVector &xidata);
-  static DoubleVector Diff(const DoubleVector &vec);
+  DoubleArray Evaluate(const DoubleArray &xidata);
+  static DoubleArray Diff(const DoubleArray &vec);
 
 protected:
-  DoubleVector m_xdata;
-  DoubleVector m_ydata;
-  DoubleVector m_weights;
+  DoubleArray m_xdata;
+  DoubleArray m_ydata;
+  DoubleArray m_weights;
 
   double m_smooth;
+
+  Coeffs m_coeffs;
 };
 
 } // namespace csaps

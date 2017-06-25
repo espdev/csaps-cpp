@@ -5,22 +5,22 @@
 namespace csaps
 {
 
-UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleVector &xdata, const DoubleVector &ydata)
-  : UnivariateCubicSmoothingSpline(xdata, ydata, DoubleVector(), -1.0)
+UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata)
+  : UnivariateCubicSmoothingSpline(xdata, ydata, DoubleArray(), -1.0)
 {
 }
 
-UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleVector &xdata, const DoubleVector &ydata, const DoubleVector &weights)
+UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata, const DoubleArray &weights)
   : UnivariateCubicSmoothingSpline(xdata, ydata, weights, -1.0)
 {
 }
 
-UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleVector &xdata, const DoubleVector &ydata, double smooth)
-  : UnivariateCubicSmoothingSpline(xdata, ydata, DoubleVector(), smooth)
+UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata, double smooth)
+  : UnivariateCubicSmoothingSpline(xdata, ydata, DoubleArray(), smooth)
 {
 }
 
-UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleVector &xdata, const DoubleVector &ydata, const DoubleVector &weights, double smooth)
+UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata, const DoubleArray &weights, double smooth)
   : m_xdata(xdata)
   , m_ydata(ydata)
   , m_weights(weights)
@@ -45,7 +45,7 @@ UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleVecto
   MakeSpline();
 }
 
-DoubleVector UnivariateCubicSmoothingSpline::operator()(const DoubleVector &xidata)
+DoubleArray UnivariateCubicSmoothingSpline::operator()(const DoubleArray &xidata)
 {
   if (xidata.size() < 2) {
     throw std::exception("There must be at least 2 data points");
@@ -54,13 +54,13 @@ DoubleVector UnivariateCubicSmoothingSpline::operator()(const DoubleVector &xida
   return Evaluate(xidata);
 }
 
-DoubleVector UnivariateCubicSmoothingSpline::operator()(size_t pcount)
+DoubleArray UnivariateCubicSmoothingSpline::operator()(size_t pcount)
 {
   if (pcount < 2) {
     throw std::exception("There must be at least 2 data points");
   }
 
-  DoubleVector xidata = DoubleVector::LinSpaced(pcount, m_xdata(0), m_xdata(m_xdata.size()-1));
+  DoubleArray xidata = DoubleArray::LinSpaced(pcount, m_xdata(0), m_xdata(m_xdata.size()-1));
 
   return Evaluate(xidata);
 }
@@ -68,14 +68,29 @@ DoubleVector UnivariateCubicSmoothingSpline::operator()(size_t pcount)
 void UnivariateCubicSmoothingSpline::MakeSpline()
 {
   size_t pcount = m_xdata.size();
+
+  auto dx = Diff(m_xdata);
+  auto dy = Diff(m_ydata);
+  auto divdxdy = dy / dx;
+
+  if (pcount > 2) {
+
+  }
+  else {
+    double p = 1.0;
+    m_coeffs = Coeffs(1, 2);
+    m_coeffs(0, 0) = divdxdy(0);
+    m_coeffs(0, 1) = m_ydata(0);
+    std::cout << m_coeffs << std::endl;
+  }
 }
 
-DoubleVector UnivariateCubicSmoothingSpline::Evaluate(const DoubleVector & xidata)
+DoubleArray UnivariateCubicSmoothingSpline::Evaluate(const DoubleArray & xidata)
 {
-  return DoubleVector();
+  return DoubleArray();
 }
 
-DoubleVector UnivariateCubicSmoothingSpline::Diff(const DoubleVector &vec)
+DoubleArray UnivariateCubicSmoothingSpline::Diff(const DoubleArray &vec)
 {
   size_t n = vec.size() - 1;
   return vec.tail(n) - vec.head(n);
