@@ -113,19 +113,23 @@ IndexArray UnivariateCubicSmoothingSpline::Digitize(const DoubleArray &arr, cons
 
   IndexArray indexes(arr.size());
 
-  // Greater or equal (a >= b)
-  auto ge = [](double a, double b)
+  auto is_inside_bin = [arr, bins](Eigen::DenseIndex item, Eigen::DenseIndex index)
   {
-    return a > b || std::abs(a - b) < std::abs(std::min(a, b)) * 1.e-8;
+    const double prc = 1.e-8;
+
+    double a = arr(item);
+    double bl = bins(index - 1);
+    double br = bins(index);
+
+    // bins[i-1] <= a < bins[i]
+    return (a > bl || std::abs(a - bl) < std::abs(std::min(a, bl)) * prc) && a < br;
   };
 
   Eigen::DenseIndex kstart = 1;
 
   for (Eigen::DenseIndex i = 0; i < arr.size(); ++i) {
-    double val = arr(i);
-
     for (Eigen::DenseIndex k = kstart; k < bins.size(); ++k) {
-      if (ge(val, bins(k - 1)) && val < bins(k)) {
+      if (is_inside_bin(i, k)) {
         indexes(i) = k;
         kstart = k;
         break;
