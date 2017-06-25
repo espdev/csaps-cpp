@@ -20,7 +20,7 @@ public:
   UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata, const DoubleArray &weights, double smooth);
 
   DoubleArray operator()(const DoubleArray &xidata);
-  DoubleArray operator()(size_t pcount);
+  DoubleArray operator()(size_t pcount, DoubleArray &xidata);
 
 protected:
   typedef Eigen::ArrayXXd Coeffs;
