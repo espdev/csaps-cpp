@@ -10,12 +10,11 @@ find_package(Eigen3 3.1 REQUIRED)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/src)
 
-enable_testing()
+set(CSAPS_INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/thirdparty
+)
 
 if (BUILD_TESTING)
-    add_executable(test_csaps test_csaps.cpp)
-    target_include_directories(test_csaps PUBLIC ${CMAKE_SOURCE_DIR}/src)
-    target_link_libraries(test_csaps csaps)
-
-    add_test(test_csaps test_csaps)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
 endif()
