@@ -87,18 +87,44 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
 
 DoubleArray UnivariateCubicSmoothingSpline::Evaluate(const DoubleArray & xidata)
 {
-  const size_t pcount = m_xdata.size();
+  const auto x_size = m_xdata.size();
 
-  auto mesh = m_xdata.segment(1, pcount - 2);
-  DoubleArray edges(pcount);
+  auto mesh = m_xdata.segment(1, x_size - 2);
+  DoubleArray edges(x_size);
 
   edges(0) = -DoubleLimits::infinity();
-  edges.segment(1, pcount - 2) = mesh;
-  edges(pcount - 1) = DoubleLimits::infinity();
+  edges.segment(1, x_size - 2) = mesh;
+  edges(x_size - 1) = DoubleLimits::infinity();
 
   auto indexes = Digitize(xidata, edges);
+  indexes -= 1;
 
-  return DoubleArray();
+  auto xi_size = xidata.size();
+
+  DoubleArray xidata_loc(xi_size);
+  DoubleArray yidata(xi_size);
+
+  for (Eigen::DenseIndex i = 0; i < xi_size; ++i) {
+    Eigen::DenseIndex index = indexes(i);
+
+    // Go to local coordinates
+    xidata_loc(i) = xidata(i) - m_xdata(index);
+
+    // Initial values
+    yidata(i) = m_coeffs(index, 0);
+  }
+
+  DoubleArray coeffs(xi_size);
+
+  for (Eigen::DenseIndex i = 1; i < m_coeffs.cols(); ++i) {
+    for (Eigen::DenseIndex k = 0; k < xi_size; ++k) {
+      coeffs(k) = m_coeffs(indexes(k), i);
+    }
+
+    yidata = xidata_loc * yidata + coeffs;
+  }
+
+  return yidata;
 }
 
 DoubleArray UnivariateCubicSmoothingSpline::Diff(const DoubleArray &vec)
