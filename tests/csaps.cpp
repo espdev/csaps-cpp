@@ -88,3 +88,127 @@ TEST_CASE("Univariate two points", "[csaps]")
 
   REQUIRE(yidata.isApprox(desired_yidata));
 }
+
+
+TEST_CASE("Make diagonal sparse matrix", "[spdiag][hide]")
+{
+  csaps::DoubleArray2D diags(3, 3); 
+  diags <<
+    1, 2, 3,
+    4, 5, 6,
+    7, 8, 9;
+  
+  csaps::IndexArray offsets(3);
+
+  SECTION("Make 3x3 matrix with offsets -1 0 1")
+  {
+    offsets << -1, 0, 1;
+
+    auto m = csaps::MakeSparseDiagMatrix(diags, offsets, 3, 3);
+
+    csaps::DoubleSparseMatrix dm(3, 3);
+    dm.coeffRef(0, 0) = 4;
+    dm.coeffRef(1, 0) = 1;
+    dm.coeffRef(0, 1) = 8;
+    dm.coeffRef(1, 1) = 5;
+    dm.coeffRef(2, 1) = 2;
+    dm.coeffRef(1, 2) = 9;
+    dm.coeffRef(2, 2) = 6;
+
+    /*
+
+     4     8     0
+     1     5     9
+     0     2     6
+
+    */
+
+    REQUIRE(m.isApprox(dm));
+  }
+
+  SECTION("Make 3x5 matrix with offsets -1 0 1")
+  {
+    offsets << -1, 0, 1;
+
+    auto m = csaps::MakeSparseDiagMatrix(diags, offsets, 3, 5);
+
+    csaps::DoubleSparseMatrix dm(3, 5);
+    dm.coeffRef(0, 0) = 4;
+    dm.coeffRef(1, 0) = 2;
+    dm.coeffRef(0, 1) = 7;
+    dm.coeffRef(1, 1) = 5;
+    dm.coeffRef(2, 1) = 3;
+    dm.coeffRef(1, 2) = 8;
+    dm.coeffRef(2, 2) = 6;
+    dm.coeffRef(2, 3) = 9;
+
+    /*
+
+     4     7     0     0     0
+     2     5     8     0     0
+     0     3     6     9     0
+
+    */
+
+    REQUIRE(m.isApprox(dm));
+  }
+
+  SECTION("Make 5x3 matrix with offsets -1 0 1")
+  {
+    offsets << -1, 0, 1;
+
+    auto m = csaps::MakeSparseDiagMatrix(diags, offsets, 5, 3);
+
+    csaps::DoubleSparseMatrix dm(5, 3);
+    dm.coeffRef(0, 0) = 4;
+    dm.coeffRef(1, 0) = 1;
+    dm.coeffRef(0, 1) = 8;
+    dm.coeffRef(1, 1) = 5;
+    dm.coeffRef(2, 1) = 2;
+    dm.coeffRef(1, 2) = 9;
+    dm.coeffRef(2, 2) = 6;
+    dm.coeffRef(3, 2) = 3;
+
+    /*
+
+     4     8     0
+     1     5     9
+     0     2     6
+     0     0     3
+     0     0     0
+
+    */
+
+    REQUIRE(m.isApprox(dm));
+  }
+
+  SECTION("Make 5x3 matrix with offsets -2 -1 0")
+  {
+    offsets << -2, -1, 0;
+
+    auto m = csaps::MakeSparseDiagMatrix(diags, offsets, 5, 3);
+
+    csaps::DoubleSparseMatrix dm(5, 3);
+    dm.coeffRef(0, 0) = 7;
+    dm.coeffRef(1, 0) = 4;
+    dm.coeffRef(2, 0) = 1;
+    dm.coeffRef(1, 1) = 8;
+    dm.coeffRef(2, 1) = 5;
+    dm.coeffRef(3, 1) = 2;
+    dm.coeffRef(2, 2) = 9;
+    dm.coeffRef(3, 2) = 6;
+    dm.coeffRef(4, 2) = 3;
+
+    /*
+
+     7     0     0
+     4     8     0
+     1     5     9
+     0     2     6
+     0     0     3
+
+    */
+
+    REQUIRE(m.isApprox(dm));
+  }
+}
