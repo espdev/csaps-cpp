@@ -12,6 +12,7 @@ namespace csaps
 {
 
 typedef Eigen::DenseIndex Index;
+typedef Index Size;
 typedef Eigen::ArrayXd DoubleArray;
 typedef Eigen::ArrayXXd DoubleArray2D;
 typedef Eigen::Array<Index, Eigen::Dynamic, 1> IndexArray;
@@ -29,7 +30,7 @@ IndexArray Digitize(const DoubleArray &arr, const DoubleArray &bins);
 
 
 //! Makes rows x cols sparse matrix from diagonals and offsets
-DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexArray& offsets, Index rows, Index cols);
+DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexArray& offsets, Size rows, Size cols);
 
 
 class UnivariateCubicSmoothingSpline
@@ -41,7 +42,7 @@ public:
   UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata, const DoubleArray &weights, double smooth);
 
   DoubleArray operator()(const DoubleArray &xidata);
-  DoubleArray operator()(const Index pcount, DoubleArray &xidata);
+  DoubleArray operator()(const Size pcount, DoubleArray &xidata);
 
   double GetSmooth() const { return m_smooth; }
   const DoubleArray& GetBreaks() const { return m_xdata; }

@@ -9,7 +9,7 @@ namespace csaps
 
 DoubleArray Diff(const DoubleArray &vec)
 {
-  Index n = vec.size() - 1;
+  const auto n = vec.size() - 1;
   return vec.tail(n) - vec.head(n);
 }
 
@@ -46,7 +46,7 @@ IndexArray Digitize(const DoubleArray &arr, const DoubleArray &bins)
   return indexes;
 }
 
-DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexArray& offsets, Index rows, Index cols)
+DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexArray& offsets, Size rows, Size cols)
 {
   auto GetNumElemsAndIndex = [rows, cols](Index offset, Index &i, Index &j)
   {
@@ -153,7 +153,7 @@ DoubleArray UnivariateCubicSmoothingSpline::operator()(const DoubleArray &xidata
   return Evaluate(xidata);
 }
 
-DoubleArray UnivariateCubicSmoothingSpline::operator()(const Index pcount, DoubleArray &xidata)
+DoubleArray UnivariateCubicSmoothingSpline::operator()(const Size pcount, DoubleArray &xidata)
 {
   if (pcount < 2) {
     throw std::exception("There must be at least 2 data points");
@@ -167,7 +167,7 @@ DoubleArray UnivariateCubicSmoothingSpline::operator()(const Index pcount, Doubl
 
 void UnivariateCubicSmoothingSpline::MakeSpline()
 {
-  auto pcount = m_xdata.size();
+  const auto pcount = m_xdata.size();
 
   auto dx = Diff(m_xdata);
   auto dy = Diff(m_ydata);
