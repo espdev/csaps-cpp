@@ -55,7 +55,7 @@ DoubleArray UnivariateCubicSmoothingSpline::operator()(const DoubleArray &xidata
   return Evaluate(xidata);
 }
 
-DoubleArray UnivariateCubicSmoothingSpline::operator()(size_t pcount, DoubleArray &xidata)
+DoubleArray UnivariateCubicSmoothingSpline::operator()(const size_t pcount, DoubleArray &xidata)
 {
   if (pcount < 2) {
     throw std::exception("There must be at least 2 data points");
@@ -75,15 +75,19 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
   auto dy = Diff(m_ydata);
   auto divdxdy = dy / dx;
 
+  double p = m_smooth;
+
   if (pcount > 2) {
 
   }
   else {
-    double p = 1.0;
-    m_coeffs = Coeffs(1, 2);
+    p = 1.0;
+    m_coeffs = CoeffsMatrix(1, 2);
     m_coeffs(0, 0) = divdxdy(0);
     m_coeffs(0, 1) = m_ydata(0);
   }
+
+  m_smooth = p;
 }
 
 DoubleArray UnivariateCubicSmoothingSpline::Evaluate(const DoubleArray & xidata)

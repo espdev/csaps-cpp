@@ -25,10 +25,16 @@ public:
   UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata, const DoubleArray &weights, double smooth);
 
   DoubleArray operator()(const DoubleArray &xidata);
-  DoubleArray operator()(size_t pcount, DoubleArray &xidata);
+  DoubleArray operator()(const size_t pcount, DoubleArray &xidata);
+
+  typedef Eigen::ArrayXXd CoeffsMatrix;
+
+  double GetSmooth() const { return m_smooth; }
+  const DoubleArray& GetBreaks() const { return m_xdata; }
+  const CoeffsMatrix& GetCoeffs() const { return m_coeffs; }
+  typename CoeffsMatrix::Index GetPieces() const { return m_coeffs.rows(); }
 
 protected:
-  typedef Eigen::ArrayXXd Coeffs;
 
   void MakeSpline();
   DoubleArray Evaluate(const DoubleArray &xidata);
@@ -46,7 +52,7 @@ protected:
 
   double m_smooth;
 
-  Coeffs m_coeffs;
+  CoeffsMatrix m_coeffs;
 };
 
 } // namespace csaps
