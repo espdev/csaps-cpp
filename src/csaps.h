@@ -41,7 +41,7 @@ public:
   UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata, const DoubleArray &weights, double smooth);
 
   DoubleArray operator()(const DoubleArray &xidata);
-  DoubleArray operator()(const size_t pcount, DoubleArray &xidata);
+  DoubleArray operator()(const Index pcount, DoubleArray &xidata);
 
   double GetSmooth() const { return m_smooth; }
   const DoubleArray& GetBreaks() const { return m_xdata; }

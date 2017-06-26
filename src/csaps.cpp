@@ -9,7 +9,7 @@ namespace csaps
 
 DoubleArray Diff(const DoubleArray &vec)
 {
-  size_t n = vec.size() - 1;
+  Index n = vec.size() - 1;
   return vec.tail(n) - vec.head(n);
 }
 
@@ -153,7 +153,7 @@ DoubleArray UnivariateCubicSmoothingSpline::operator()(const DoubleArray &xidata
   return Evaluate(xidata);
 }
 
-DoubleArray UnivariateCubicSmoothingSpline::operator()(const size_t pcount, DoubleArray &xidata)
+DoubleArray UnivariateCubicSmoothingSpline::operator()(const Index pcount, DoubleArray &xidata)
 {
   if (pcount < 2) {
     throw std::exception("There must be at least 2 data points");
