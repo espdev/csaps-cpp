@@ -6,7 +6,35 @@
 #include "catch.hpp"
 
 
-TEST_CASE("Univariate auto smoothing", "[csaps][hide][segfault]")
+TEST_CASE("Univariate auto smoothing :: 4 points", "[csaps]")
+{
+  const size_t pcount = 4;
+
+  csaps::DoubleArray xdata(pcount);
+  xdata << 1, 2, 4, 6;
+
+  csaps::DoubleArray ydata(pcount);
+  ydata << 2, 4, 5, 7;
+
+  csaps::UnivariateCubicSmoothingSpline sp(xdata, ydata);
+
+  const size_t xidata_size = 10;
+
+  csaps::DoubleArray xidata;
+  csaps::DoubleArray yidata = sp(xidata_size, xidata);
+
+  csaps::DoubleArray desired_yidata(xidata_size);
+  desired_yidata <<
+    2.2579392157892, 3.0231172855707, 3.6937304019483,
+    4.21971044584031, 4.65026761247821, 5.04804510368134,
+    5.47288175793241, 5.94265482897362, 6.44293945952166,
+    6.95847986982311;
+
+  REQUIRE(xidata.size() == xidata_size);
+  REQUIRE(yidata.isApprox(desired_yidata));
+}
+
+TEST_CASE("Univariate auto smoothing :: 21 points", "[csaps][hide][segfault]")
 {
   const size_t pcount = 21;
 
@@ -87,6 +115,20 @@ TEST_CASE("Univariate two points", "[csaps]")
   csaps::DoubleArray desired_yidata(pcount + 1); desired_yidata << 3., 3.5, 4.;
 
   REQUIRE(yidata.isApprox(desired_yidata));
+}
+
+
+TEST_CASE("Diff 4 elements", "[diff]")
+{
+  csaps::DoubleArray arr(4);
+  arr << 1, 2, 4, 6;
+
+  auto d = csaps::Diff(arr);
+
+  csaps::DoubleArray dd(3);
+  dd << 1, 2, 2;
+
+  REQUIRE(d.isApprox(dd));
 }
 
 
@@ -205,6 +247,34 @@ TEST_CASE("Make diagonal sparse matrix", "[spdiag][hide]")
      4     8     0
      1     5     9
      0     2     6
+     0     0     3
+
+    */
+
+    REQUIRE(m.isApprox(dm));
+  }
+
+  SECTION("Make 3x3 matrix with offset 0")
+  {
+    csaps::DoubleArray diag(3);
+    diag << 1, 2, 3;
+
+    csaps::IndexArray offset(1);
+    offset << 0;
+
+    auto m = csaps::MakeSparseDiagMatrix(diag.transpose(), offset, 3, 3);
+
+    std::cout << m << std::endl;
+
+    csaps::DoubleSparseMatrix dm(3, 3);
+    dm.coeffRef(0, 0) = 1;
+    dm.coeffRef(1, 1) = 2;
+    dm.coeffRef(2, 2) = 3;
+
+    /*
+
+     1     0     0
+     0     2     0
      0     0     3
 
     */
