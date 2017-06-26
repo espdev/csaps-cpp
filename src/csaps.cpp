@@ -97,7 +97,7 @@ DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexA
     }
 
     for (Index l = 0; l < n; ++l) {
-      m.coeffRef((int)(i+l), (int)(j+l)) = diag(l);
+      m.insert((int)(i+l), (int)(j+l)) = diag(l);
     }
   }
 
@@ -171,31 +171,59 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
 
   auto dx = Diff(m_xdata);
   auto dy = Diff(m_ydata);
-  auto divdxdy = dy / dx;
+  auto divdydx = dy / dx;
 
   double p = m_smooth;
 
   if (pcount > 2) {
+    // Create diagonal sparse matrices
     const auto n = dx.size() - 1;
-
-    auto tail = dx.tail(n);
-    auto head = dx.head(n);
 
     DoubleArray2D diags(3, n);
 
-    diags.row(0) = tail;
-    diags.row(1) = 2 * (tail + head);
-    diags.row(2) = head;
+    auto head_r = dx.head(n);
+    auto tail_r = dx.tail(n);
+
+    diags.row(0) = tail_r;
+    diags.row(1) = 2 * (tail_r + head_r);
+    diags.row(2) = head_r;
     
-    IndexArray offsets; offsets << -1, 0, 1;
+    IndexArray offsets(3); 
+    
+    offsets << -1, 0, 1;
 
     auto r = MakeSparseDiagMatrix(diags, offsets, pcount - 2, pcount - 2);
+
+    auto odx = 1. / dx;
+
+    auto head_qt = odx.head(n);
+    auto tail_qt = odx.tail(n);
+
+    diags.row(0) = head_qt;
+    diags.row(1) = -(tail_qt + head_qt);
+    diags.row(2) = tail_qt;
+
+    offsets << 0, 1, 2;
+
+    auto qt = MakeSparseDiagMatrix(diags, offsets, pcount - 2, pcount);
+
+    auto ow = 1. / m_weights;
+    auto osqw = 1. / m_weights.sqrt();
+    
+    offsets.resize(1);
+    offsets << 0;
+
+    auto w = MakeSparseDiagMatrix(ow.transpose(), offsets, pcount, pcount);
+    auto qw = MakeSparseDiagMatrix(osqw.transpose(), offsets, pcount, pcount);
+    
+    auto qtw = qt * qw;
+    auto qtwq = qtw * qtw.transpose();
 
   }
   else {
     p = 1.0;
     m_coeffs = DoubleArray2D(1, 2);
-    m_coeffs(0, 0) = divdxdy(0);
+    m_coeffs(0, 0) = divdydx(0);
     m_coeffs(0, 1) = m_ydata(0);
   }
 
