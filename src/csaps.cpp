@@ -218,6 +218,22 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
     
     auto qtw = qt * qw;
     auto qtwq = qtw * qtw.transpose();
+    
+    auto Trace = [](const DoubleSparseMatrix &m)
+    {
+      return m.diagonal().sum();
+    };
+
+    double p = m_smooth;
+
+    if (p < 0) {
+      p = 1. / (1. + Trace(r) / (6. * Trace(qtwq)));
+    }
+    
+    auto A = ((6. * (1. - p)) * qtwq) + (p * r);
+    auto b = Diff(divdydx);
+
+    // # Solve linear system Ab = u
 
   }
   else {

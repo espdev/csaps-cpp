@@ -16,7 +16,7 @@ typedef Index Size;
 typedef Eigen::ArrayXd DoubleArray;
 typedef Eigen::ArrayXXd DoubleArray2D;
 typedef Eigen::Array<Index, Eigen::Dynamic, 1> IndexArray;
-typedef Eigen::SparseMatrix<double, Eigen::RowMajor, Index> DoubleSparseMatrix;
+typedef Eigen::SparseMatrix<double, Eigen::ColMajor, Index> DoubleSparseMatrix;
 
 typedef std::numeric_limits<double> DoubleLimits;
 
