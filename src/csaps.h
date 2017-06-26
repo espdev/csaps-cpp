@@ -11,11 +11,11 @@
 namespace csaps
 {
 
+typedef Eigen::DenseIndex Index;
 typedef Eigen::ArrayXd DoubleArray;
 typedef Eigen::ArrayXXd DoubleArray2D;
-typedef Eigen::Array<Eigen::DenseIndex, Eigen::Dynamic, 1> IndexArray;
-typedef Eigen::SparseMatrix<double, Eigen::RowMajor> DoubleSparseMatrix;
-typedef DoubleSparseMatrix::Index SparseIndex;
+typedef Eigen::Array<Index, Eigen::Dynamic, 1> IndexArray;
+typedef Eigen::SparseMatrix<double, Eigen::RowMajor, Index> DoubleSparseMatrix;
 
 typedef std::numeric_limits<double> DoubleLimits;
 
@@ -29,7 +29,7 @@ IndexArray Digitize(const DoubleArray &arr, const DoubleArray &bins);
 
 
 //! Makes rows x cols sparse matrix from diagonals and offsets
-DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexArray& offsets, SparseIndex rows, SparseIndex cols);
+DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexArray& offsets, Index rows, Index cols);
 
 
 class UnivariateCubicSmoothingSpline

@@ -19,7 +19,7 @@ IndexArray Digitize(const DoubleArray &arr, const DoubleArray &bins)
 
   IndexArray indexes = IndexArray::Zero(arr.size());
 
-  auto IsInsideBin = [arr, bins](Eigen::DenseIndex item, Eigen::DenseIndex index)
+  auto IsInsideBin = [arr, bins](Index item, Index index)
   {
     const double prc = 1.e-8;
 
@@ -31,10 +31,10 @@ IndexArray Digitize(const DoubleArray &arr, const DoubleArray &bins)
     return (a > bl || std::abs(a - bl) < std::abs(std::min(a, bl)) * prc) && a < br;
   };
 
-  Eigen::DenseIndex kstart = 1;
+  Index kstart = 1;
 
-  for (Eigen::DenseIndex i = 0; i < arr.size(); ++i) {
-    for (Eigen::DenseIndex k = kstart; k < bins.size(); ++k) {
+  for (Index i = 0; i < arr.size(); ++i) {
+    for (Index k = kstart; k < bins.size(); ++k) {
       if (IsInsideBin(i, k)) {
         indexes(i) = k;
         kstart = k;
@@ -46,10 +46,9 @@ IndexArray Digitize(const DoubleArray &arr, const DoubleArray &bins)
   return indexes;
 }
 
-DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexArray& offsets, SparseIndex rows, SparseIndex cols)
+DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexArray& offsets, Index rows, Index cols)
 {
-  auto GetNumElemsAndIndex = [rows, cols](Eigen::DenseIndex offset, 
-    Eigen::DenseIndex &i, Eigen::DenseIndex &j)
+  auto GetNumElemsAndIndex = [rows, cols](Index offset, Index &i, Index &j)
   {
     if (offset < 0) {
       i = -offset;
@@ -65,9 +64,9 @@ DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexA
 
   DoubleSparseMatrix m(rows, cols);
 
-  for (Eigen::DenseIndex k = 0; k < offsets.size(); ++k) {
+  for (Index k = 0; k < offsets.size(); ++k) {
     auto offset = offsets(k);
-    Eigen::DenseIndex i, j;
+    Index i, j;
 
     DoubleArray diag = diags.row(k);
     auto n = GetNumElemsAndIndex(offset, i, j);
@@ -97,7 +96,7 @@ DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexA
       }
     }
 
-    for (Eigen::DenseIndex l = 0; l < n; ++l) {
+    for (Index l = 0; l < n; ++l) {
       m.coeffRef((int)(i+l), (int)(j+l)) = diag(l);
     }
   }
@@ -188,6 +187,10 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
     diags.row(1) = 2 * (tail + head);
     diags.row(2) = head;
     
+    IndexArray offsets; offsets << -1, 0, 1;
+
+    auto r = MakeSparseDiagMatrix(diags, offsets, pcount - 2, pcount - 2);
+
   }
   else {
     p = 1.0;
@@ -218,8 +221,8 @@ DoubleArray UnivariateCubicSmoothingSpline::Evaluate(const DoubleArray & xidata)
   DoubleArray xidata_loc(xi_size);
   DoubleArray yidata(xi_size);
 
-  for (Eigen::DenseIndex i = 0; i < xi_size; ++i) {
-    Eigen::DenseIndex index = indexes(i);
+  for (Index i = 0; i < xi_size; ++i) {
+    Index index = indexes(i);
 
     // Go to local coordinates
     xidata_loc(i) = xidata(i) - m_xdata(index);
@@ -230,8 +233,8 @@ DoubleArray UnivariateCubicSmoothingSpline::Evaluate(const DoubleArray & xidata)
 
   DoubleArray coeffs(xi_size);
 
-  for (Eigen::DenseIndex i = 1; i < m_coeffs.cols(); ++i) {
-    for (Eigen::DenseIndex k = 0; k < xi_size; ++k) {
+  for (Index i = 1; i < m_coeffs.cols(); ++i) {
+    for (Index k = 0; k < xi_size; ++k) {
       coeffs(k) = m_coeffs(indexes(k), i);
     }
 
