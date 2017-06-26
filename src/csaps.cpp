@@ -104,6 +104,22 @@ DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexA
   return m;
 }
 
+csaps::DoubleArray SolveLinearSystem(const DoubleSparseMatrix &A, const DoubleArray &b)
+{
+  Eigen::SparseLU<DoubleSparseMatrix> solver;
+
+  // Compute the ordering permutation vector from the structural pattern of A
+  solver.analyzePattern(A);
+
+  // Compute the numerical factorization
+  solver.factorize(A);
+  
+  // Use the factors to solve the linear system
+  DoubleArray x = solver.solve(b.matrix()).array();
+
+  return x;
+}
+
 UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleArray &xdata, const DoubleArray &ydata)
   : UnivariateCubicSmoothingSpline(xdata, ydata, DoubleArray(), -1.0)
 {
@@ -207,8 +223,8 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
 
     auto qt = MakeSparseDiagMatrix(diags, offsets, pcount - 2, pcount);
 
-    auto ow = 1. / m_weights;
-    auto osqw = 1. / m_weights.sqrt();
+    DoubleArray ow = 1. / m_weights;
+    DoubleArray osqw = 1. / m_weights.sqrt();
     
     offsets.resize(1);
     offsets << 0;
@@ -216,8 +232,8 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
     auto w = MakeSparseDiagMatrix(ow.transpose(), offsets, pcount, pcount);
     auto qw = MakeSparseDiagMatrix(osqw.transpose(), offsets, pcount, pcount);
     
-    auto qtw = qt * qw;
-    auto qtwq = qtw * qtw.transpose();
+    DoubleSparseMatrix qtw = qt * qw;
+    DoubleSparseMatrix qtwq = qtw * qtw.transpose();
     
     auto Trace = [](const DoubleSparseMatrix &m)
     {
@@ -230,10 +246,13 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
       p = 1. / (1. + Trace(r) / (6. * Trace(qtwq)));
     }
     
-    auto A = ((6. * (1. - p)) * qtwq) + (p * r);
+    DoubleSparseMatrix A = ((6. * (1. - p)) * qtwq) + (p * r);
+    A.makeCompressed();
+
     auto b = Diff(divdydx);
 
-    // # Solve linear system Ab = u
+    // Solve linear system Ab = u
+    auto u = SolveLinearSystem(A, b);
 
   }
   else {

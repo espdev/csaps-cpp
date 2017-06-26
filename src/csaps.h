@@ -6,6 +6,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include <Eigen/SparseLU>
 
 
 namespace csaps
@@ -31,6 +32,10 @@ IndexArray Digitize(const DoubleArray &arr, const DoubleArray &bins);
 
 //! Makes rows x cols sparse matrix from diagonals and offsets
 DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexArray& offsets, Size rows, Size cols);
+
+
+//! Solves sparse linear system Ab = x via supernodal LU factorization
+DoubleArray SolveLinearSystem(const DoubleSparseMatrix &A, const DoubleArray &b);
 
 
 class UnivariateCubicSmoothingSpline
