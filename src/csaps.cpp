@@ -61,7 +61,8 @@ DoubleArray UnivariateCubicSmoothingSpline::operator()(size_t pcount, DoubleArra
     throw std::exception("There must be at least 2 data points");
   }
 
-  xidata = DoubleArray::LinSpaced(pcount, m_xdata(0), m_xdata(m_xdata.size()-1));
+  xidata.resize(pcount);
+  xidata << DoubleArray::LinSpaced(pcount, m_xdata(0), m_xdata(m_xdata.size()-1));
 
   return Evaluate(xidata);
 }
