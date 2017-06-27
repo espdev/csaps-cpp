@@ -122,7 +122,7 @@ TEST_CASE("Diff 4 elements", "[diff]")
   csaps::DoubleArray arr(4);
   arr << 1, 2, 4, 6;
 
-  auto d = csaps::Diff(arr);
+  csaps::DoubleArray d = csaps::Diff(arr);
 
   csaps::DoubleArray dd(3);
   dd << 1, 2, 2;
@@ -145,7 +145,7 @@ TEST_CASE("Make diagonal sparse matrix", "[spdiag][hide]")
   {
     offsets << -1, 0, 1;
 
-    auto m = csaps::MakeSparseDiagMatrix(diags, offsets, 3, 3);
+    csaps::DoubleSparseMatrix m = csaps::MakeSparseDiagMatrix(diags, offsets, 3, 3);
 
     csaps::DoubleSparseMatrix dm(3, 3);
     dm.coeffRef(0, 0) = 4;
@@ -171,7 +171,7 @@ TEST_CASE("Make diagonal sparse matrix", "[spdiag][hide]")
   {
     offsets << -1, 0, 1;
 
-    auto m = csaps::MakeSparseDiagMatrix(diags, offsets, 3, 5);
+    csaps::DoubleSparseMatrix m = csaps::MakeSparseDiagMatrix(diags, offsets, 3, 5);
 
     csaps::DoubleSparseMatrix dm(3, 5);
     dm.coeffRef(0, 0) = 4;
@@ -198,7 +198,7 @@ TEST_CASE("Make diagonal sparse matrix", "[spdiag][hide]")
   {
     offsets << -1, 0, 1;
 
-    auto m = csaps::MakeSparseDiagMatrix(diags, offsets, 5, 3);
+    csaps::DoubleSparseMatrix m = csaps::MakeSparseDiagMatrix(diags, offsets, 5, 3);
 
     csaps::DoubleSparseMatrix dm(5, 3);
     dm.coeffRef(0, 0) = 4;
@@ -227,7 +227,7 @@ TEST_CASE("Make diagonal sparse matrix", "[spdiag][hide]")
   {
     offsets << -2, -1, 0;
 
-    auto m = csaps::MakeSparseDiagMatrix(diags, offsets, 5, 3);
+    csaps::DoubleSparseMatrix m = csaps::MakeSparseDiagMatrix(diags, offsets, 5, 3);
 
     csaps::DoubleSparseMatrix dm(5, 3);
     dm.coeffRef(0, 0) = 7;
@@ -261,7 +261,7 @@ TEST_CASE("Make diagonal sparse matrix", "[spdiag][hide]")
     csaps::IndexArray offset(1);
     offset << 0;
 
-    auto m = csaps::MakeSparseDiagMatrix(diag.transpose(), offset, 3, 3);
+    csaps::DoubleSparseMatrix m = csaps::MakeSparseDiagMatrix(diag.transpose(), offset, 3, 3);
 
     std::cout << m << std::endl;
 

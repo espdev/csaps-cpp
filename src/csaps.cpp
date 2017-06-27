@@ -8,7 +8,7 @@ namespace csaps
 
 DoubleArray Diff(const DoubleArray &vec)
 {
-  const auto n = vec.size() - 1;
+  const Size n = vec.size() - 1;
   return vec.tail(n) - vec.head(n);
 }
 
@@ -64,10 +64,10 @@ DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexA
   DoubleSparseMatrix m(rows, cols);
 
   for (Index k = 0; k < offsets.size(); ++k) {
-    auto offset = offsets(k);
+    Index offset = offsets(k);
     Index i, j;
 
-    auto n = GetNumElemsAndIndex(offset, i, j);
+    Index n = GetNumElemsAndIndex(offset, i, j);
 
     // When rows == cols or rows > cols, the function takes elements of the 
     // super-diagonal from the lower part of the corresponding diag array, and 
@@ -182,24 +182,24 @@ DoubleArray UnivariateCubicSmoothingSpline::operator()(const Size pcount, Double
 
 void UnivariateCubicSmoothingSpline::MakeSpline()
 {
-  const auto pcount = m_xdata.size();
-  const auto pcount_m1 = pcount - 1;
-  const auto pcount_m2 = pcount - 2;
+  const Size pcount = m_xdata.size();
+  const Size pcount_m1 = pcount - 1;
+  const Size pcount_m2 = pcount - 2;
 
-  auto dx = Diff(m_xdata);
-  auto dy = Diff(m_ydata);
-  auto divdydx = dy / dx;
+  DoubleArray dx = Diff(m_xdata);
+  DoubleArray dy = Diff(m_ydata);
+  DoubleArray divdydx = dy / dx;
 
   double p = m_smooth;
 
   if (pcount > 2) {
     // Create diagonal sparse matrices
-    const auto n = dx.size() - 1;
+    const Size n = dx.size() - 1;
 
     DoubleArray2D diags(3, n);
 
-    auto head_r = dx.head(n);
-    auto tail_r = dx.tail(n);
+    DoubleArray head_r = dx.head(n);
+    DoubleArray tail_r = dx.tail(n);
 
     diags.row(0) = tail_r;
     diags.row(1) = 2 * (tail_r + head_r);
@@ -209,12 +209,12 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
     
     offsets << -1, 0, 1;
 
-    auto r = MakeSparseDiagMatrix(diags, offsets, pcount_m2, pcount_m2);
+    DoubleSparseMatrix r = MakeSparseDiagMatrix(diags, offsets, pcount_m2, pcount_m2);
 
-    auto odx = 1. / dx;
+    DoubleArray odx = 1. / dx;
 
-    auto head_qt = odx.head(n);
-    auto tail_qt = odx.tail(n);
+    DoubleArray head_qt = odx.head(n);
+    DoubleArray tail_qt = odx.tail(n);
 
     diags.row(0) = head_qt;
     diags.row(1) = -(tail_qt + head_qt);
@@ -222,7 +222,7 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
 
     offsets << 0, 1, 2;
 
-    auto qt = MakeSparseDiagMatrix(diags, offsets, pcount_m2, pcount);
+    DoubleSparseMatrix qt = MakeSparseDiagMatrix(diags, offsets, pcount_m2, pcount);
 
     DoubleArray ow = 1. / m_weights;
     DoubleArray osqw = 1. / m_weights.sqrt();
@@ -230,8 +230,8 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
     offsets.resize(1);
     offsets << 0;
 
-    auto w = MakeSparseDiagMatrix(ow.transpose(), offsets, pcount, pcount);
-    auto qw = MakeSparseDiagMatrix(osqw.transpose(), offsets, pcount, pcount);
+    DoubleSparseMatrix w = MakeSparseDiagMatrix(ow.transpose(), offsets, pcount, pcount);
+    DoubleSparseMatrix qw = MakeSparseDiagMatrix(osqw.transpose(), offsets, pcount, pcount);
     
     DoubleSparseMatrix qtw = qt * qw;
     DoubleSparseMatrix qtwq = qtw * qtw.transpose();
@@ -250,10 +250,10 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
     DoubleSparseMatrix A = ((6. * (1. - p)) * qtwq) + (p * r);
     A.makeCompressed();
 
-    auto b = Diff(divdydx);
+    DoubleArray b = Diff(divdydx);
 
     // Solve linear system Ab = u
-    auto u = SolveLinearSystem(A, b);
+    DoubleArray u = SolveLinearSystem(A, b);
     
     DoubleArray d1 = DoubleArray::Zero(u.size() + 2);
     d1.segment(1, u.size()) = u; d1 = Diff(d1) / dx;
@@ -287,19 +287,19 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
 
 DoubleArray UnivariateCubicSmoothingSpline::Evaluate(const DoubleArray & xidata)
 {
-  const auto x_size = m_xdata.size();
+  const Size x_size = m_xdata.size();
 
-  auto mesh = m_xdata.segment(1, x_size - 2);
+  DoubleArray mesh = m_xdata.segment(1, x_size - 2);
   DoubleArray edges(x_size);
 
   edges(0) = -DoubleLimits::infinity();
   edges.segment(1, x_size - 2) = mesh;
   edges(x_size - 1) = DoubleLimits::infinity();
 
-  auto indexes = Digitize(xidata, edges);
+  IndexArray indexes = Digitize(xidata, edges);
   indexes -= 1;
 
-  auto xi_size = xidata.size();
+  const Size xi_size = xidata.size();
 
   DoubleArray xidata_loc(xi_size);
   DoubleArray yidata(xi_size);
