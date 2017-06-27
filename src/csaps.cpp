@@ -1,6 +1,5 @@
 #include <cmath>
 #include <algorithm>
-#include <iostream>
 
 #include "csaps.h"
 

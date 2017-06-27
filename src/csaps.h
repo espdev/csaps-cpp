@@ -55,7 +55,6 @@ public:
   DoubleArray2D::Index GetPieces() const { return m_coeffs.rows(); }
 
 protected:
-
   void MakeSpline();
   DoubleArray Evaluate(const DoubleArray &xidata);
 

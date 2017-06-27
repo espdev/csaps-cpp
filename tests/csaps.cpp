@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "csaps.h"
 
 #define CATCH_CONFIG_MAIN
