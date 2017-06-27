@@ -68,7 +68,6 @@ DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexA
     auto offset = offsets(k);
     Index i, j;
 
-    DoubleArray diag = diags.row(k);
     auto n = GetNumElemsAndIndex(offset, i, j);
 
     // When rows == cols or rows > cols, the function takes elements of the 
@@ -78,26 +77,27 @@ DoubleSparseMatrix MakeSparseDiagMatrix(const DoubleArray2D& diags, const IndexA
     // When rows < cols, the function does the opposite, taking elements of the 
     // super-diagonal from the upper part of the corresponding diag array, and 
     // elements of the sub-diagonal from the lower part of the corresponding diag array.
+    DoubleArray diag(n);
 
     if (offset < 0) {
       if (rows >= cols) {
-        diag = diag.head(n);
+        diag = diags.row(k).head(n);
       }
       else {
-        diag = diag.tail(n);
+        diag = diags.row(k).tail(n);
       }
     }
     else {
       if (rows >= cols) {
-        diag = diag.tail(n);
+        diag = diags.row(k).tail(n);
       }
       else {
-        diag = diag.head(n);
+        diag = diags.row(k).head(n);
       }
     }
 
     for (Index l = 0; l < n; ++l) {
-      m.insert((int)(i+l), (int)(j+l)) = diag(l);
+      m.insert(i+l, j+l) = diag(l);
     }
   }
 
@@ -255,7 +255,7 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
 
     // Solve linear system Ab = u
     auto u = SolveLinearSystem(A, b);
-
+    
     DoubleArray d1 = DoubleArray::Zero(u.size() + 2);
     d1.segment(1, u.size()) = u; d1 = Diff(d1) / dx;
 
