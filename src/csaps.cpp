@@ -1,5 +1,6 @@
 #include <cmath>
 #include <algorithm>
+#include <stdexcept>
 
 #include "csaps.h"
 
@@ -141,7 +142,7 @@ UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleArray
   , m_smooth(smooth)
 {
   if (m_xdata.size() < 2) {
-    throw std::exception("There must be at least 2 data points");
+    throw std::runtime_error("There must be at least 2 data points");
   }
 
   if (m_weights.size() == 0) {
@@ -149,11 +150,11 @@ UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleArray
   }
 
   if (m_smooth > 1.0) {
-    throw std::exception("Smoothing parameter must be less than or equal 1.0");
+    throw std::runtime_error("Smoothing parameter must be less than or equal 1.0");
   }
 
   if (m_xdata.size() != m_ydata.size() || m_xdata.size() != m_weights.size()) {
-    throw std::exception("Lenghts of the input data vectors are not equal");
+    throw std::runtime_error("Lenghts of the input data vectors are not equal");
   }
 
   MakeSpline();
@@ -162,7 +163,7 @@ UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleArray
 DoubleArray UnivariateCubicSmoothingSpline::operator()(const DoubleArray &xidata)
 {
   if (xidata.size() < 2) {
-    throw std::exception("There must be at least 2 data points");
+    throw std::runtime_error("There must be at least 2 data points");
   }
 
   return Evaluate(xidata);
@@ -171,7 +172,7 @@ DoubleArray UnivariateCubicSmoothingSpline::operator()(const DoubleArray &xidata
 DoubleArray UnivariateCubicSmoothingSpline::operator()(const Size pcount, DoubleArray &xidata)
 {
   if (pcount < 2) {
-    throw std::exception("There must be at least 2 data points");
+    throw std::runtime_error("There must be at least 2 data points");
   }
 
   xidata.resize(pcount);
