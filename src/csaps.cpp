@@ -184,6 +184,8 @@ DoubleArray UnivariateCubicSmoothingSpline::operator()(const Size pcount, Double
 void UnivariateCubicSmoothingSpline::MakeSpline()
 {
   const auto pcount = m_xdata.size();
+  const auto pcount_m1 = pcount - 1;
+  const auto pcount_m2 = pcount - 2;
 
   auto dx = Diff(m_xdata);
   auto dy = Diff(m_ydata);
@@ -208,7 +210,7 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
     
     offsets << -1, 0, 1;
 
-    auto r = MakeSparseDiagMatrix(diags, offsets, pcount - 2, pcount - 2);
+    auto r = MakeSparseDiagMatrix(diags, offsets, pcount_m2, pcount_m2);
 
     auto odx = 1. / dx;
 
@@ -221,7 +223,7 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
 
     offsets << 0, 1, 2;
 
-    auto qt = MakeSparseDiagMatrix(diags, offsets, pcount - 2, pcount);
+    auto qt = MakeSparseDiagMatrix(diags, offsets, pcount_m2, pcount);
 
     DoubleArray ow = 1. / m_weights;
     DoubleArray osqw = 1. / m_weights.sqrt();
@@ -254,10 +256,29 @@ void UnivariateCubicSmoothingSpline::MakeSpline()
     // Solve linear system Ab = u
     auto u = SolveLinearSystem(A, b);
 
+    DoubleArray d1 = DoubleArray::Zero(u.size() + 2);
+    d1.segment(1, u.size()) = u; d1 = Diff(d1) / dx;
+
+    DoubleArray d2 = DoubleArray::Zero(d1.size() + 2);
+    d2.segment(1, d1.size()) = d1; d2 = Diff(d2);
+
+    DoubleArray yi = m_ydata - ((6. * (1. - p)) * w * d2.matrix()).array();
+    
+    DoubleArray c3 = DoubleArray::Zero(u.size() + 2);
+    c3.segment(1, u.size()) = p * u;
+
+    DoubleArray c2 = Diff(yi) / dx - dx * (2. * c3.head(pcount_m1) + c3.tail(pcount_m1));
+
+    m_coeffs.resize(pcount_m1, 4);
+
+    m_coeffs.col(0) = Diff(c3) / dx;
+    m_coeffs.col(1) = 3. * c3.head(pcount_m1);
+    m_coeffs.col(2) = c2;
+    m_coeffs.col(3) = yi.head(pcount_m1);
   }
   else {
     p = 1.0;
-    m_coeffs = DoubleArray2D(1, 2);
+    m_coeffs.resize(1, 2);
     m_coeffs(0, 0) = divdydx(0);
     m_coeffs(0, 1) = m_ydata(0);
   }
