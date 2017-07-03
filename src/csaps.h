@@ -52,7 +52,7 @@ public:
   double GetSmooth() const { return m_smooth; }
   const DoubleArray& GetBreaks() const { return m_xdata; }
   const DoubleArray2D& GetCoeffs() const { return m_coeffs; }
-  DoubleArray2D::Index GetPieces() const { return m_coeffs.rows(); }
+  Index GetPieces() const { return m_coeffs.rows(); }
 
 protected:
   void MakeSpline();
