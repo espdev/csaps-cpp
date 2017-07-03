@@ -12,14 +12,14 @@
 namespace csaps
 {
 
-typedef Eigen::DenseIndex Index;
-typedef Index Size;
-typedef Eigen::ArrayXd DoubleArray;
-typedef Eigen::ArrayXXd DoubleArray2D;
-typedef Eigen::Array<Index, Eigen::Dynamic, 1> IndexArray;
-typedef Eigen::SparseMatrix<double, Eigen::ColMajor, Index> DoubleSparseMatrix;
+using Index = Eigen::DenseIndex;
+using Size = Index;
+using DoubleArray = Eigen::ArrayXd;
+using DoubleArray2D = Eigen::ArrayXXd;
+using IndexArray = Eigen::Array<Index, Eigen::Dynamic, 1>;
+using DoubleSparseMatrix = Eigen::SparseMatrix<double, Eigen::ColMajor, Index>;
 
-typedef std::numeric_limits<double> DoubleLimits;
+using DoubleLimits = std::numeric_limits<double>;
 
 
 //! Calculates the 1-th discrete difference
