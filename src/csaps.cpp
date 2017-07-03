@@ -298,6 +298,8 @@ DoubleArray UnivariateCubicSmoothingSpline::Evaluate(const DoubleArray & xidata)
   edges(x_size - 1) = DoubleLimits::infinity();
 
   IndexArray indexes = Digitize(xidata, edges);
+
+  // Use 0 as the start index
   indexes -= 1;
 
   const Size xi_size = xidata.size();
