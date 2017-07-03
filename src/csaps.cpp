@@ -146,7 +146,7 @@ UnivariateCubicSmoothingSpline::UnivariateCubicSmoothingSpline(const DoubleArray
   }
 
   if (m_weights.size() == 0) {
-    m_weights = Eigen::VectorXd::Constant(m_xdata.size(), 1.0);
+    m_weights = DoubleArray::Constant(m_xdata.size(), 1.0);
   }
 
   if (m_smooth > 1.0) {
