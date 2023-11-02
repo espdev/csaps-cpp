@@ -17,7 +17,7 @@ IndexArray Digitize(const DoubleArray &arr, const DoubleArray &bins)
 {
   // This code works if `arr` and `bins` are monotonically increasing
 
-  IndexArray indexes = IndexArray::Zero(arr.size());
+  IndexArray indexes = IndexArray::Ones(arr.size());
 
   auto IsInsideBin = [arr, bins](Index item, Index index)
   {
